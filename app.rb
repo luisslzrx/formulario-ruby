@@ -1,15 +1,30 @@
-# Requerimos Sinatra para crear la app web
 require 'sinatra'
+require 'pony'
 
-# Ruta GET para mostrar el formulario
 get '/' do
   erb :formulario
 end
 
-# Ruta POST para procesar datos enviados desde el formulario
 post '/submit' do
   nombre = params[:nombre]
   email = params[:email]
 
-  "¡Gracias #{nombre}! Hemos recibido tu correo: #{email}"
+  Pony.mail(
+    to: 'luisgerdx521@gmail.com',      # correo destino donde quieres recibir el mensaje
+    from: email,                      # correo remitente (del formulario)
+    subject: "Nuevo mensaje de #{nombre}",
+    body: "Has recibido un mensaje de #{nombre} con el correo: #{email}",
+    via: :smtp,
+    via_options: {
+      address: 'smtp.gmail.com',
+      port: '587',
+      enable_starttls_auto: true,
+      user_name: 'luisgerdx521@gmail.com',      # tu correo para autenticar SMTP
+      password: 'wwju agtg otio miex',              # tu contraseña o app password
+      authentication: :plain,
+      domain: "localhost.localdomain"
+    }
+  )
+
+  "¡Gracias #{nombre}! Hemos enviado tu correo."
 end
